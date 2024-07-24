@@ -4,10 +4,12 @@ from addresses.models import City, Street
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .utils import get_open_shops, get_closed_shops
+from nordclantest.custom_authenticate import CustomTokenAuthentication, IsAuthenticated
 
 class ShopViewSet(viewsets.ModelViewSet):
     queryset = Shop.objects.all()
     serializer_class = ShopSerializer
+    authentication_classes = [CustomTokenAuthentication]
 
     def create(self, request, *args, **kwargs):
         # создаю экземпляр сериализатора
