@@ -246,7 +246,23 @@
 ![image](https://github.com/user-attachments/assets/3f9227a7-8838-4be3-9c6c-f45c54dca379)
 ![image](https://github.com/user-attachments/assets/0e60e961-2fa6-43ca-b622-376ec4f18446)
 
+#### Уже собирался отправлять задание, но решил еще сделать token для Get запроса, просто написал кастомный CustomTokenAuthentication
 
+```python
+  class CustomTokenAuthentication(BaseAuthentication):
+      def authenticate(self, request):
+          # Получение токена из заголовка
+          token = request.headers.get('Authorization')
+          if not token:
+              Response({'error': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+  
+          if token == 'NordClanSecretTokenValue':
+              return (None, None)
+          else:
+              return Response({'error': 'invalid token'}, status=status.HTTP_400_BAD_REQUEST)
+```
+
+В случае ошибки так же вернет статус 400.
 
 
 
