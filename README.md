@@ -246,7 +246,7 @@
 ![image](https://github.com/user-attachments/assets/3f9227a7-8838-4be3-9c6c-f45c54dca379)
 ![image](https://github.com/user-attachments/assets/0e60e961-2fa6-43ca-b622-376ec4f18446)
 
-#### Уже собирался отправлять задание, но решил еще сделать token для Get запроса, просто написал кастомный CustomTokenAuthentication
+#### Уже собирался отправлять задание, но решил еще сделать token для запросов, связанных с магазинами
 
 ```python
   class CustomTokenAuthentication(BaseAuthentication):
@@ -264,6 +264,8 @@
 
 В случае ошибки так же вернет статус 400.
 
+Теперь для запросов GET и Post, связанных с получением/добавлением магазинов,
+необходимо указывать параметр в Headers (key=Authorization, value=NordClanSecretTokenValue)
 
 
 
