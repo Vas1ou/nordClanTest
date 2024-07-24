@@ -7,3 +7,10 @@
 # Исключение временных файлов и директорий
 __pycache__/
 *.pyc
+
+# Исключаю файлв миграций за исключением __init__
+/nordclantest/addresses/migrations/*
+!/nordclantest/addresses/migrations/__init__.py
+
+/nordclantest/shops/migrations/*
+!/nordclantest/shops/migrations/__init__.py
