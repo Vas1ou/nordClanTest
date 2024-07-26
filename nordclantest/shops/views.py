@@ -8,7 +8,7 @@ from nordclantest.custom_authenticate import CustomTokenAuthentication, IsAuthen
 
 
 class ShopViewSet(viewsets.ModelViewSet):
-    queryset = Shop.objects.all()
+    queryset = Shop.objects.select_related('city', 'street').all()
     serializer_class = ShopSerializer
     authentication_classes = [CustomTokenAuthentication]
     CLOSED_STORE = '0'
