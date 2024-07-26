@@ -26,15 +26,13 @@ class ShopSerializer(serializers.ModelSerializer):
         street_id = validated_data.pop('street_id', None)
 
         # Попытка получения города по идентификатору
-        try:
-            city = City.objects.get(id=city_id)
-        except City.DoesNotExist:
+        city = City.objects.filter(id=city_id).first()
+        if not city:
             raise serializers.ValidationError({'error': f'Город с id - {city_id} отсутствует в базе данных'})
 
         # Попытка получения улицы по идентификатору
-        try:
-            street = Street.objects.get(id=street_id)
-        except Street.DoesNotExist:
+        street = Street.objects.select_related('city').filter(id=street_id).first()
+        if not street:
             raise serializers.ValidationError({'error': f'Улица с id - {street_id} отсутствует в базе данных'})
 
         # Решил еще перед сохранением объекта, проверять, что улица принадлежит этому городу
