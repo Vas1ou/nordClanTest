@@ -6,10 +6,13 @@ from rest_framework.response import Response
 from .utils import get_open_shops, get_closed_shops
 from nordclantest.custom_authenticate import CustomTokenAuthentication, IsAuthenticated
 
+
 class ShopViewSet(viewsets.ModelViewSet):
     queryset = Shop.objects.all()
     serializer_class = ShopSerializer
     authentication_classes = [CustomTokenAuthentication]
+    CLOSED_STORE = '0'
+    OPENED_STORE = '1'
 
     def create(self, request, *args, **kwargs):
         # создаю экземпляр сериализатора
@@ -36,8 +39,8 @@ class ShopViewSet(viewsets.ModelViewSet):
         time_in_town = None
 
         if city_id:
-            try:
-                city = City.objects.get(pk=city_id)
+            city = City.objects.filter(pk=city_id).first()
+            if city:
                 # Получаю текущее время в городе
                 time_in_town = city.current_time
                 if street_id:
@@ -50,17 +53,17 @@ class ShopViewSet(viewsets.ModelViewSet):
                 else:
                     queryset = queryset.filter(city_id=city_id)
 
-            except City.DoesNotExist:
+            else:
                 return Response({'error': f'Город с id - {city_id} отсутствует в базе данных'},
                                 status=status.HTTP_400_BAD_REQUEST)
 
         elif street_id:
-            try:
-                street = Street.objects.get(pk=street_id)
+            street = Street.objects.filter(pk=street_id).first()
+            if street:
                 # Получаю текущее время в городе
                 time_in_town = street.city.current_time
                 queryset = queryset.filter(street_id=street_id)
-            except Street.DoesNotExist:
+            else:
                 return Response({'error': f'Улица с id - {street_id} отсутствует в базе данных'})
 
         """
@@ -69,7 +72,7 @@ class ShopViewSet(viewsets.ModelViewSet):
         Далее, необходимо определить, в итоговом queryset открыты ли магазины или нет
         (скорей всего, надо было это делать в одном запросе, понимаю... )
         """
-        if open_status == '1':
+        if open_status == self.OPENED_STORE:
             # Необходимо вернуть все магазины с текущего города, которые открыты
             if time_in_town:
                 queryset = queryset.filter(opening_time__lte=time_in_town, closing_time__gte=time_in_town)
@@ -77,7 +80,7 @@ class ShopViewSet(viewsets.ModelViewSet):
             # Необходимо вернуть все открытые магазины на текущий момент
             else:
                 queryset = get_open_shops(queryset)
-        elif open_status == '0':
+        elif open_status == self.CLOSED_STORE:
             # Необходимо отдать все магазины с текущего города, которые закрыты
             if time_in_town:
                 queryset = queryset.exclude(opening_time__lte=time_in_town, closing_time__gte=time_in_town)
